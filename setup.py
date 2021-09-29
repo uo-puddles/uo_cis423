@@ -86,7 +86,6 @@ class OHETransformer(BaseEstimator, TransformerMixin):
     X_ = pd.get_dummies(X_, columns=[self.target_column],
                         dummy_na=self.dummy_na,
                         drop_first = self.drop_first)
-    print(f'OHETransformer columns: {X_.columns.to_list()}')
     return X_
 
   def fit_transform(self, X, y = None):
