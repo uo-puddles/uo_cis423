@@ -149,3 +149,41 @@ class TukeyTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
+
+#chapter 5 asks for 1 new transformer
+
+class MinMaxTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self):
+    self.column_stats = dict()
+
+  #fill in rest below
+  def fit(self, X, y = None):
+    assert isinstance(X, pd.core.frame.DataFrame), f'MinMaxTransformer.fit expected Dataframe but got {type(X)} instead.'
+    if y: print(f'Warning: MinMaxTransformer.fit did not expect a value for y but got {type(y)} instead.')
+    self.column_stats = {c:(X[c].min(),X[c].max()) for c in X.columns.to_list()}
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'MinMaxTransformer.transform expected Dataframe but got {type(X)} instead.'
+    assert self.column_stats, f'MinMaxTransformer.transform expected fit method to be called prior.'
+    X_ = X.copy()
+    fit_columns = set(self.column_stats.keys())
+    transform_columns = set(X_.columns.to_list())
+    not_fit = transform_columns - fit_columns
+    not_transformed = fit_columns - transform_columns
+    if not_fit: print(f'Warning: MinMaxTransformer.transform has more columns than fit: {not_fit}.')
+    if not_transformed: print(f'Warning: MinMaxTransformer.transform has fewer columns than fit: {not_transformed}.')
+
+    for c in fit_columns:
+      if c not in transform_columns: continue
+      cmin,cmax = self.column_stats[c]
+      denom = cmax-cmin
+      new_col = [(v-cmin)/denom for v in X_[c].to_list()]  #note NaNs remain NaNs - nice
+      X_[c] = new_col
+    
+    return X_
+
+  def fit_transform(self, X, y = None):
+    self.fit(X,y)
+    result = self.transform(X)
+    return result
