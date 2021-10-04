@@ -187,3 +187,53 @@ class MinMaxTransformer(BaseEstimator, TransformerMixin):
     self.fit(X,y)
     result = self.transform(X)
     return result
+
+##added in chapter 6
+
+class KNNTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self,n_neighbors=5, weights="uniform", add_indicator=False):
+    self.n_neighbors = n_neighbors
+    self.weights=weights 
+    self.add_indicator=add_indicator
+
+  #your code
+  def fit(self, X, y = None):
+    print(f'Warning: KNNTransformer.fit does nothing.')
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'KNNTransformer.transform expected Dataframe but got {type(X)} instead.'
+    X_ = X.copy()
+    imputer = KNNImputer(n_neighbors=self.n_neighbors, weights=self.weights, add_indicator=self.add_indicator)
+    columns = X_.columns
+    matrix = imputer.fit_transform(X_)
+    result_df = pd.DataFrame(matrix,columns=columns)
+    return result_df
+
+  def fit_transform(self, X, y = None):
+    result = self.transform(X)
+    return result
+
+class IterativeTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self, estimator, max_iter=10, random_state=1234):
+    self.estimator = estimator
+    self.max_iter=max_iter 
+    self.random_state=random_state
+
+  #your code
+  def fit(self, X, y = None):
+    print(f'Warning: IterativeTransformer.fit does nothing.')
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'IterativeTransformer.transform expected Dataframe but got {type(X)} instead.'
+    X_ = X.copy()
+    imputer = IterativeImputer(estimator=self.estimator, max_iter=self.max_iter, random_state=self.random_state)
+    columns = X_.columns
+    matrix = imputer.fit_transform(X_)
+    result_df = pd.DataFrame(matrix,columns=columns)
+    return result_df
+
+  def fit_transform(self, X, y = None):
+    result = self.transform(X)
+    return result
