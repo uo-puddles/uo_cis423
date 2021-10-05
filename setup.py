@@ -237,3 +237,34 @@ class IterativeTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
+
+#chapter 7 add
+
+from sklearn.metrics import f1_score#, balanced_accuracy_score, precision_score, recall_score
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegressionCV
+
+def find_random_state(domain_df, labels, n=200):
+  model = LogisticRegressionCV(random_state=1, max_iter=5000)
+
+  def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+  Var = []  #collect test_error/train_error where error based on F1 score
+  for i in range(1, n):
+      train_X, test_X, train_y, test_y = train_test_split(domain_df, labels, test_size=0.2, shuffle=True,
+                                                      random_state=i, stratify=labels)
+      model.fit(train_X, train_y)
+      train_pred = model.predict(train_X)
+      test_pred = model.predict(test_X)
+      train_error = f1_score(train_y, train_pred)
+      test_error = f1_score(test_y, test_pred)
+      variance = test_error/train_error
+      Var.append(variance)
+      
+  rs_value = np.average(Var)
+
+  nearest = find_nearest(Var, rs_value)
+  return Var.index(nearest)
