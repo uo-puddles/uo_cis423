@@ -14,6 +14,8 @@ from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
 
+from sklearn.impute import KNNImputer  #chapter 6
+
 #drop by removing or keeping
 class DropColumnsTransformer(BaseEstimator, TransformerMixin):
   def __init__(self, column_list, action='drop'):
